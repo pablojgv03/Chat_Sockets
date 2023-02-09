@@ -1,5 +1,7 @@
 package com.example.mychat;
 
+import static android.widget.Toast.LENGTH_LONG;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -10,11 +12,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.mychat.adapter.RecyclerAdapter;
 
@@ -24,15 +24,15 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ImageButton btnEnviar;
+    private ImageButton imgBtEnviar,imgButtonIP;
     private TextView txtMensaje, ip;
-
+    private String ipValue;
     private ArrayList<String> list;
-
+    private boolean listo = false;
+    private Toast toastE, toastC, toastEstablished;
     RecyclerView recyclerView;
     RecyclerAdapter recAdapter;
 
@@ -40,6 +40,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         list = new ArrayList<>();
+        toastE = Toast.makeText(getApplicationContext(),"Set a contact IP", Toast.LENGTH_SHORT);
+        toastC = Toast.makeText(getApplicationContext(),"Send", Toast.LENGTH_SHORT);
+        toastEstablished = Toast.makeText(getApplicationContext(),"Established IP", Toast.LENGTH_SHORT);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         recyclerView = (RecyclerView) findViewById(R.id.recView);
@@ -50,19 +53,50 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView.setLayoutManager(layoutManager);
 
-        btnEnviar = (ImageButton) findViewById(R.id.btEnviar);
+        imgButtonIP = (ImageButton) findViewById(R.id.imgButtonIP);
+        imgBtEnviar = (ImageButton) findViewById(R.id.btEnviar);
         txtMensaje= (TextView) findViewById(R.id.txtMensaje);
         ip= (TextView) findViewById(R.id.txtIP);
 
-        btnEnviar.setVisibility(View.INVISIBLE);
+        imgBtEnviar.setVisibility(View.INVISIBLE);
+        imgButtonIP.setVisibility(View.INVISIBLE);
         servidor();
-        btnEnviar.setOnClickListener(new View.OnClickListener() {
+        imgBtEnviar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                enviar();
+                if(listo){
+                    enviar();
+                }else{
+                    toastE.show();
+                }
+            }
+        });
+        imgButtonIP.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ipValue = ip.getText().toString();
+                listo = true;
+                toastEstablished.show();
             }
         });
 
+
+        ip.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.toString().trim().length() > 0) {
+                    imgButtonIP.setVisibility(View.VISIBLE);
+                }else{
+                    imgButtonIP.setVisibility(View.INVISIBLE);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
 
         //Detecto cambios en el editText y cada vez que uno sea detectado verifico si la longitud del texto
         //es mayor de 0 en ese caso activo el boton, esto lo hago para controlar que no haya mensajes nulos
@@ -74,9 +108,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.toString().trim().length() > 0) {
-                    btnEnviar.setVisibility(View.VISIBLE);
+                    imgBtEnviar.setVisibility(View.VISIBLE);
                 } else {
-                    btnEnviar.setVisibility(View.INVISIBLE);
+                    imgBtEnviar.setVisibility(View.INVISIBLE);
                 }
             }
 
@@ -98,8 +132,10 @@ public class MainActivity extends AppCompatActivity {
                     misocket = new Socket(ip.getText().toString() ,9999);
                     DataOutputStream dos = new DataOutputStream(misocket.getOutputStream());
                     String mensaje =  txtMensaje.getText().toString();
-                    dos.writeUTF(mensaje);
                     list.add("E"+txtMensaje.getText().toString());
+                    toastC.show();
+                    txtMensaje.setText("");
+                    dos.writeUTF(mensaje);
                     misocket.close();
                 } catch (IOException ex) {
                     Log.e("Error", "Error al enviar mensaje: " + ex.getMessage());
