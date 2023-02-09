@@ -6,10 +6,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -25,7 +28,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button btnEnviar;
+    private ImageButton btnEnviar;
     private TextView txtMensaje, ip;
 
     private ArrayList<String> list;
@@ -47,11 +50,11 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView.setLayoutManager(layoutManager);
 
-        btnEnviar = (Button) findViewById(R.id.btEnviar);
+        btnEnviar = (ImageButton) findViewById(R.id.btEnviar);
         txtMensaje= (TextView) findViewById(R.id.txtMensaje);
         ip= (TextView) findViewById(R.id.txtIP);
 
-
+        btnEnviar.setVisibility(View.INVISIBLE);
         servidor();
         btnEnviar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,6 +62,29 @@ public class MainActivity extends AppCompatActivity {
                 enviar();
             }
         });
+
+
+        //Detecto cambios en el editText y cada vez que uno sea detectado verifico si la longitud del texto
+        //es mayor de 0 en ese caso activo el boton, esto lo hago para controlar que no haya mensajes nulos
+        //en caso de que se borre el texto vuelvo a ocultar el boton
+        txtMensaje.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.toString().trim().length() > 0) {
+                    btnEnviar.setVisibility(View.VISIBLE);
+                } else {
+                    btnEnviar.setVisibility(View.INVISIBLE);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+
     }
 
 
@@ -73,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
                     DataOutputStream dos = new DataOutputStream(misocket.getOutputStream());
                     String mensaje =  txtMensaje.getText().toString();
                     dos.writeUTF(mensaje);
-                    list.add("1"+txtMensaje.getText().toString());
+                    list.add("E"+txtMensaje.getText().toString());
                     misocket.close();
                 } catch (IOException ex) {
                     Log.e("Error", "Error al enviar mensaje: " + ex.getMessage());
@@ -103,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                         Socket misocket = servidor.accept();
                         DataInputStream dis = new DataInputStream(misocket.getInputStream());
 
-                        list.add("2" + dis.readUTF());
+                        list.add("R" + dis.readUTF());
                         misocket.close();
                     }
                 } catch (IOException ex) {
