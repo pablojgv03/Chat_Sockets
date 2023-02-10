@@ -1,6 +1,7 @@
 package com.example.mychat;
 
 import android.annotation.SuppressLint;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -37,6 +38,7 @@ public class chat extends AppCompatActivity {
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         list = new ArrayList<>();
         toastE = Toast.makeText(getApplicationContext(), "Set a contact IP", Toast.LENGTH_SHORT);
         toastC = Toast.makeText(getApplicationContext(), "Send", Toast.LENGTH_SHORT);
@@ -139,6 +141,7 @@ public class chat extends AppCompatActivity {
                     dos.writeUTF(mensaje);
                     misocket.close();
                 } catch (IOException ex) {
+                    list.add("E" + "Error al enviar \"" + txtMensaje.getText().toString() + "\"");
                     Log.e("Error", "Error al enviar mensaje: " + ex.getMessage());
                 } finally {
                     if (misocket != null) {
