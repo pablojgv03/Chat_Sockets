@@ -130,7 +130,7 @@ public class chat extends AppCompatActivity {
             public void run() {
                 Socket misocket = null;
                 try {
-                    misocket = new Socket(ip.getText().toString(), 9999);
+                    misocket = new Socket(ipValue, 9999);
                     DataOutputStream dos = new DataOutputStream(misocket.getOutputStream());
                     String mensaje = txtMensaje.getText().toString();
                     list.add("E" + txtMensaje.getText().toString());
