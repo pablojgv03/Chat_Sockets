@@ -170,6 +170,7 @@ public class chat extends AppCompatActivity {
                         DataInputStream dis = new DataInputStream(misocket.getInputStream());
 
                         list.add("R" + dis.readUTF());
+
                         misocket.close();
                     }
                 } catch (IOException ex) {
