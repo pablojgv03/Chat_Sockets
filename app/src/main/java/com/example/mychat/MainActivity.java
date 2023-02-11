@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity{
 
         btnStart = (Button) findViewById(R.id.button);
 
-
+        //cuando se pulse el boton start abro la actividad chat
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

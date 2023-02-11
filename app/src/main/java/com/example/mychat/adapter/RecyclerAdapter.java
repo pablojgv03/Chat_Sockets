@@ -14,6 +14,7 @@ import com.example.mychat.R;
 import java.util.List;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.RecyclerHolder> {
+    //list de mensajes
     List<String> lstMensajes;
 
     public RecyclerAdapter(List<String> lstMensajes) {
@@ -31,9 +32,16 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerHolder holder, int position) {
+        //Guardo el mensaje nuevo
         String mesaje = lstMensajes.get(position);
+
+        //obtengo si el mensaje pertenece al receptor o al emisor
         String emisor_receptor = mesaje.substring(0,1);
+
+        //guardo la parte que me interesa del mensaje
         mesaje = mesaje.substring(1);
+
+        //dependiendo de a quien pertenezca lo adigno al textView correspondiente y hago invisible el otro
         if(emisor_receptor.equals("E")){
             holder.txtMsgDer.setText(mesaje);
             holder.txtMsgIzq.setVisibility(View.GONE);
